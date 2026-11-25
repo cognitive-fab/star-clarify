@@ -1,0 +1,7 @@
+{
+ "model": "qwen3-30b-a3b-thinking-2507 (Q4_K_M)",
+ "content": "version 3 against base and skill on 100 prompts not used in its design",
+ "max_tokens": 16000,
+ "sampling": "temperature 0.6, top-p 0.95, top-k 20 (set on the llama.cpp server)",
+ "judge": "mistral-large-latest"
+}

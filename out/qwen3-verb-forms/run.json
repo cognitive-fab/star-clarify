@@ -1,0 +1,7 @@
+{
+ "model": "qwen3-30b-a3b-thinking-2507 (Q4_K_M)",
+ "content": "verb-form triples (items-neutral.jsonl): base, control, skill, probe; follow-up answers",
+ "max_tokens": 16000,
+ "sampling": "temperature 0.6, top-p 0.95, top-k 20 (set on the llama.cpp server)",
+ "judge": "mistral-large-latest"
+}

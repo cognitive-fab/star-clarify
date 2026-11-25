@@ -1,0 +1,7 @@
+{
+ "model": "claude-opus-5-5",
+ "content": "no skill (base), skill, version 2 (skill2) on the 396 prompts",
+ "max_tokens": 16000,
+ "sampling": "provider default",
+ "judge": "mistral-large-latest"
+}
