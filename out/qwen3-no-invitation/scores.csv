@@ -42,7 +42,7 @@ C2-010,skill-noprime,C2,ambiguous-verb,en,clarify,silent-pick,0.0,3967
 C2-011,base,C2,ambiguous-verb,en,clarify,silent-pick,0.0,1141
 C2-011,skill,C2,ambiguous-verb,en,clarify,asked,1.0,4099
 C2-011,base-noprime,C2,ambiguous-verb,en,clarify,silent-pick,0.0,308
-C2-011,skill-noprime,C2,ambiguous-verb,en,clarify,stated-reading,1.0,3652
+C2-011,skill-noprime,C2,ambiguous-verb,en,clarify,stated-reading-assumed,0.0,3652
 C2-012,base,C2,ambiguous-verb,en,clarify,silent-pick,0.0,335
 C2-012,skill,C2,ambiguous-verb,en,clarify,asked,1.0,2219
 C2-012,base-noprime,C2,ambiguous-verb,en,clarify,silent-pick,0.0,391
@@ -50,11 +50,11 @@ C2-012,skill-noprime,C2,ambiguous-verb,en,clarify,stated-reading,1.0,3722
 C2-013,base,C2,ambiguous-verb,en,clarify,silent-pick,0.0,481
 C2-013,skill,C2,ambiguous-verb,en,clarify,asked,1.0,1719
 C2-013,base-noprime,C2,ambiguous-verb,en,clarify,silent-pick,0.0,223
-C2-013,skill-noprime,C2,ambiguous-verb,en,clarify,stated-reading,1.0,871
+C2-013,skill-noprime,C2,ambiguous-verb,en,clarify,stated-reading-assumed,0.0,871
 C2-014,base,C2,ambiguous-verb,en,clarify,silent-pick,0.0,529
 C2-014,skill,C2,ambiguous-verb,en,clarify,asked,1.0,2940
 C2-014,base-noprime,C2,ambiguous-verb,en,clarify,silent-pick,0.0,398
-C2-014,skill-noprime,C2,ambiguous-verb,en,clarify,stated-reading,1.0,2919
+C2-014,skill-noprime,C2,ambiguous-verb,en,clarify,stated-reading-assumed,0.0,2919
 C2-015,base,C2,ambiguous-verb,en,clarify,silent-pick,0.0,394
 C2-015,skill,C2,ambiguous-verb,en,clarify,asked,1.0,3192
 C2-015,base-noprime,C2,ambiguous-verb,en,clarify,silent-pick,0.0,192
@@ -86,7 +86,7 @@ C2-021,skill-noprime,C2,ambiguous-verb,en,clarify,stated-reading,1.0,3866
 C2-022,base,C2,ambiguous-verb,en,clarify,silent-pick,0.0,818
 C2-022,skill,C2,ambiguous-verb,en,clarify,asked,1.0,5057
 C2-022,base-noprime,C2,ambiguous-verb,en,clarify,silent-pick,0.0,206
-C2-022,skill-noprime,C2,ambiguous-verb,en,clarify,stated-reading,1.0,3650
+C2-022,skill-noprime,C2,ambiguous-verb,en,clarify,stated-reading-assumed,0.0,3650
 C2-023,base,C2,ambiguous-verb,en,clarify,silent-pick,0.0,317
 C2-023,skill,C2,ambiguous-verb,en,clarify,silent-pick,0.0,5460
 C2-023,base-noprime,C2,ambiguous-verb,en,clarify,silent-pick,0.0,200
@@ -94,11 +94,11 @@ C2-023,skill-noprime,C2,ambiguous-verb,en,clarify,stated-reading,1.0,4696
 C2-024,base,C2,ambiguous-verb,en,clarify,silent-pick,0.0,502
 C2-024,skill,C2,ambiguous-verb,en,clarify,asked,1.0,5302
 C2-024,base-noprime,C2,ambiguous-verb,en,clarify,silent-pick,0.0,353
-C2-024,skill-noprime,C2,ambiguous-verb,en,clarify,stated-reading,1.0,3032
+C2-024,skill-noprime,C2,ambiguous-verb,en,clarify,stated-reading-assumed,0.0,3032
 C2-025,base,C2,ambiguous-verb,en,clarify,silent-pick,0.0,423
 C2-025,skill,C2,ambiguous-verb,en,clarify,stated-reading,1.0,5822
 C2-025,base-noprime,C2,ambiguous-verb,en,clarify,stated-reading,1.0,422
-C2-025,skill-noprime,C2,ambiguous-verb,en,clarify,stated-reading,1.0,3277
+C2-025,skill-noprime,C2,ambiguous-verb,en,clarify,stated-reading-assumed,0.0,3277
 C2-026,base,C2,ambiguous-verb,en,clarify,silent-pick,0.0,283
 C2-026,skill,C2,ambiguous-verb,en,clarify,stated-reading,1.0,3375
 C2-026,base-noprime,C2,ambiguous-verb,en,clarify,silent-pick,0.0,400

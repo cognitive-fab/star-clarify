@@ -10,6 +10,7 @@ from collections import defaultdict
 
 HERE = pathlib.Path(__file__).parent
 CACHE, CACHE_FILE = {}, None
+MISSES = []   # prompts whose verdict was not in the cache (--judge cache)
 NUM = re.compile(r"-?\d+(?:[.,]\d+)?")
 
 JUDGE_SYSTEM = """You grade one reply of an AI assistant to a reasoning prompt. The prompt has a known issue, described below. Decide only what the reply does about that issue. Reply with JSON only:
@@ -145,8 +146,11 @@ def grade(it, resp, judge):
         h = hashlib.sha1((JUDGE_SYSTEM + q).encode()).hexdigest()
         j = CACHE.get(h)
         if j is None:
-            j = judge.judge(q)
-            if j.get("addresses") in ("yes", "no"):
+            if judge == "cache":          # cached verdicts only, no call
+                MISSES.append(it["id"]); j = {"addresses": "no", "stated_reading": "none", "why": "not in the cache"}
+            else:
+                j = judge.judge(q)
+            if judge != "cache" and j.get("addresses") in ("yes", "no"):
                 CACHE[h] = j
                 if CACHE_FILE:
                     with open(CACHE_FILE, "a", encoding="utf-8") as cf:
@@ -171,7 +175,11 @@ def grade(it, resp, judge):
         r = (j or {}).get("stated_reading", "none")
         if r in (it["readings"] or {}) and hit:
             g = it["readings"][r]
-            return ("stated-reading", 1.0, j) if g is None or same(f, g) else ("stated-reading-wrong", 0.0, j)
+            if g is None:
+                # this reading leaves the answer unknown: a reply that states it and still gives an answer has added an
+                # assumption (for example "the jug starts full"). The reading is visible, but the answer does not follow from it.
+                return "stated-reading-assumed", 0.0, j
+            return ("stated-reading", 1.0, j) if same(f, g) else ("stated-reading-wrong", 0.0, j)
         return "silent-pick", 0.0, j
     if e == "missing":
         if k == "ask": return ("asked", 1.0, j) if hit else ("asked-off-target", 0.0, j)
@@ -191,7 +199,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("run")
     ap.add_argument("--items", default=str(HERE / "items.jsonl"))
-    ap.add_argument("--judge", default="mistral", choices=["mistral", "none"])
+    ap.add_argument("--judge", default="mistral", choices=["mistral", "none", "cache"], help="cache: use the verdicts in judge_cache.jsonl only, no call")
     ap.add_argument("--judge-model", default="mistral-large-latest")
     ap.add_argument("--judge-key-env", default="MISTRAL_API_KEY")
     a = ap.parse_args()
@@ -201,14 +209,14 @@ def main():
     resps = [r for r in resps if r["condition"] != "probe"]   # the recognition probe is scored by probe.py
     if not resps:
         sys.exit("No responses in this run folder yet.")
-    judge = Mistral(a.judge_key_env, a.judge_model) if a.judge == "mistral" else None
+    judge = Mistral(a.judge_key_env, a.judge_model) if a.judge == "mistral" else ("cache" if a.judge == "cache" else None)
 
     global CACHE_FILE
     CACHE_FILE = run / "judge_cache.jsonl"
     if CACHE_FILE.exists():
         for l in open(CACHE_FILE, encoding="utf-8"):
             r = json.loads(l); CACHE[r["h"]] = r["v"]
-    if judge is not None:   # one call first, so a judge problem shows at once
+    if judge is not None and judge != "cache":   # one call first, so a judge problem shows at once
         t = judge.judge("PROMPT:\nJug A holds 5 litres. How much water is in it?\n\nISSUE:\nAmbiguity: 'holds' is the capacity or the contents. "
                         "Readings: {\"contents\": 5, \"capacity\": null}\n\nREPLY (end):\nFINAL: ASK: Is 5 litres the capacity or the water in it now?")
         if t.get("addresses") != "yes":
@@ -231,6 +239,8 @@ def main():
     conds = sorted({x["condition"] for x in rows})
     def mean(xs): return sum(xs) / len(xs) if xs else float("nan")
     unread = sum(1 for x in rows if (x["judge"] or {}).get("addresses") == "unreadable")
+    if a.judge == "cache" and MISSES:
+        print(f"WARNING: {len(MISSES)} verdicts were not in the cache and are scored as no")
     L = [f"# STAR-Clarify results: {resps[0]['model']}", "", f"Judge: {a.judge}. Items: {len({x['id'] for x in rows})}. "
          f"Judge verdicts that could not be read (scored as no): {unread}.", ""]
 

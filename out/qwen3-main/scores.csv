@@ -154,7 +154,7 @@ C2-001,skill,C2,ambiguous-verb,en,clarify,asked,1.0,1859
 C2-001,skill2,C2,ambiguous-verb,en,clarify,asked,1.0,2559
 C2-002,base,C2,ambiguous-verb,en,clarify,silent-pick,0.0,273
 C2-002,skill,C2,ambiguous-verb,en,clarify,asked,1.0,5643
-C2-002,skill2,C2,ambiguous-verb,en,clarify,stated-reading,1.0,3646
+C2-002,skill2,C2,ambiguous-verb,en,clarify,stated-reading-assumed,0.0,3646
 C2-003,base,C2,ambiguous-verb,en,clarify,silent-pick,0.0,593
 C2-003,skill,C2,ambiguous-verb,en,clarify,asked,1.0,2629
 C2-003,skill2,C2,ambiguous-verb,en,clarify,asked,1.0,3102

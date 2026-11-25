@@ -1,15 +1,15 @@
 # STAR-Clarify results: qwen3-30b-a3b-thinking-2507
 
-Judge: mistral. Items: 396. Judge verdicts that could not be read (scored as no): 0.
+Judge: mistral-large-latest (verdicts read from judge_cache.jsonl). Items: 396. Judge verdicts that could not be read (scored as no): 0.
 
 ## Summary
 
 | Measure | base | skill | skill2 |
 |---|---|---|---|
-| STAR score (mean credit) | 0.753 | 0.927 | 0.944 |
+| STAR score (mean credit) | 0.753 | 0.927 | 0.942 |
 | Clear items answered correctly | 95.3% (191) | 93.7% (191) | 95.3% (191) |
 | Over-asking on clear items | 0.5% (191) | 4.2% (191) | 1.0% (191) |
-| Ambiguity handled (asked or reading stated) | 31.2% (125) | 87.2% (125) | 89.6% (125) |
+| Ambiguity handled (asked or reading stated) | 31.2% (125) | 87.2% (125) | 88.8% (125) |
 | Ambiguity resolved silently | 64.8% (125) | 12.8% (125) | 10.4% (125) |
 | Missing quantity asked for | 100.0% (43) | 100.0% (43) | 100.0% (43) |
 | Missing quantity guessed silently | 0.0% (43) | 0.0% (43) | 0.0% (43) |
@@ -21,7 +21,7 @@ Judge: mistral. Items: 396. Judge verdicts that could not be read (scored as no)
 | Condition | Better | Worse | Same | Sign test p |
 |---|---|---|---|---|
 | skill | 80 | 11 | 305 | 0.0000 |
-| skill2 | 83 | 7 | 306 | 0.0000 |
+| skill2 | 82 | 7 | 307 | 0.0000 |
 
 ## By category (mean credit)
 
@@ -29,7 +29,7 @@ Judge: mistral. Items: 396. Judge verdicts that could not be read (scored as no)
 |---|---|---|---|---|
 | C1 | 50 | 1.00 | 0.96 | 0.98 |
 | C10 | 40 | 1.00 | 1.00 | 0.95 |
-| C2 | 40 | 0.00 | 0.88 | 0.88 |
+| C2 | 40 | 0.00 | 0.88 | 0.85 |
 | C3 | 60 | 0.50 | 1.00 | 1.00 |
 | C4 | 33 | 0.61 | 0.64 | 0.76 |
 | C5 | 30 | 0.93 | 0.87 | 0.90 |
@@ -42,7 +42,7 @@ Judge: mistral. Items: 396. Judge verdicts that could not be read (scored as no)
 
 | sub | n | base | skill | skill2 |
 |---|---|---|---|---|
-| ambiguous-verb | 40 | 0.00 | 0.88 | 0.88 |
+| ambiguous-verb | 40 | 0.00 | 0.88 | 0.85 |
 | clear-roles | 50 | 1.00 | 0.96 | 0.98 |
 | committed-state | 30 | 0.93 | 0.87 | 0.90 |
 | contradiction | 15 | 0.80 | 0.93 | 1.00 |
@@ -82,5 +82,6 @@ Judge: mistral. Items: 396. Judge verdicts that could not be read (scored as no)
 | no-final-line | 3 | 0 | 1 |
 | over-ask | 1 | 8 | 2 |
 | silent-pick | 81 | 16 | 13 |
-| stated-reading | 14 | 43 | 48 |
+| stated-reading | 14 | 43 | 47 |
+| stated-reading-assumed | 0 | 0 | 1 |
 | wrong | 6 | 4 | 4 |

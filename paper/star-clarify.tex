@@ -49,9 +49,12 @@ a model to declare the world of a prompt before reasoning. On the
 ambiguous prompts, Claude Opus~5.5 resolves 20\% silently and
 Qwen3-30B-A3B 65\%. With the skill these shares fall to 0\% and 13\%. A
 control prompt that only tells the model to state its reading, without
-STAR, removes most of the silent resolutions (24\% remain), and the skill
-keeps its advantage where the role of a value is open, including on verbs
-it never names. Asked to judge the wording, the smaller model calls 80\% of
+STAR, removes most of the silent resolutions on one-step prompts (24\%
+remain). The skill keeps its advantage where the role of a value is open,
+including on verbs it never names. Inside a planning problem it removes
+an error on clear wording, in which the model plans with a stated
+capacity as if it were an amount (23 of 30 prompts without the skill, 0
+with it). Asked to judge the wording, the smaller model calls 80\% of
 the prompts it resolved silently unclear: it notices most of these
 problems and does not report them when it solves.
 
@@ -94,6 +97,13 @@ different answers, so the prompt is expected to be clarified.}
 \label{fig:readings}
 \end{figure}
 
+The question weighs more as models work in chains. Buehler
+\cite{buehler2026making} describes laboratories in which agents write the
+simulators they need, run the experimental campaigns, and ``hand the
+results to the next agent without waiting for us''. In such a chain, a
+reading that one model chose silently reaches the next model as a fact,
+and no person is placed to ask which reading it was.
+
 Two results motivate this study. A study of the reasoning traces of four
 models on water-jug problems \cite{dubray2026grammarllm} described every
 sentence of the reasoning with four categories of human language (Things,
@@ -112,8 +122,9 @@ tests that remedy. It contributes:
 
 \begin{itemize}\setlength\itemsep{2pt}
 \item a benchmark, STAR-Clarify, of 396 prompts with exact expected
-behavior, half of them clear, and two additional sets (held-out verbs,
-and triples that differ only in the form of the verb);
+behavior, half of them clear, and three additional sets (held-out verbs,
+triples that differ only in the form of the verb, and planning problems
+with a role-ambiguous value);
 \item a skill (a system prompt of about 1,200 words) that applies the STAR
 declaration, with two variants and a control prompt without STAR;
 \item a measurement on one frontier model and one open-weight model, with
@@ -267,10 +278,10 @@ and C9 pair each ambiguous prompt with a reworded clear one. C4 also
 contains rules whose two readings give the same answer to the question
 asked: a question there is counted as needless.
 
-\subsection{Two additional sets}
+\subsection{Three additional sets}
 \label{sec:sets}
 
-Two sets were added to test the main result on role ambiguity.
+Three sets were added to test the main result on role ambiguity.
 
 \emph{Held-out verbs} (80 prompts). The 40 ambiguous prompts use the
 template of C2 with eight verbs and Things that appear in no version of
@@ -298,6 +309,17 @@ Modal & The lift can carry at most 34 people. How many people are in the lift ri
 \caption{One verb-form triple. Eight Things, five numbers each.}
 \label{tab:triples}
 \end{table}
+
+\emph{Planning triples} (90 prompts). The role-ambiguous value sits inside
+a planning problem. Jug A and jug B have a sink and no tap. Jug A can be
+poured into jug B until A is empty or B is full, and jug B can be emptied
+into the sink. The question asks for the smallest number of actions that
+leaves a given amount in jug B: 1, 3 or 5 actions, ten problems at each
+depth. Each problem comes in three versions. ``Jug A holds 20 litres'' is
+ambiguous. ``Jug A has 20 litres of water in it right now'' states the
+amount, and the answer is the number of actions. ``Jug A is empty and can
+hold at most 20 litres'' states the capacity, and the goal cannot be
+reached, since there is no water.
 
 \section{The skill}
 \label{sec:skill}
@@ -376,8 +398,8 @@ discarded and only the final content was scored.
 \emph{No skill}: no system prompt. \emph{Skill}, \emph{version~2},
 \emph{control}: the corresponding text as system prompt. Opus was run
 without the skill, with the skill and with version~2. Qwen3 was run in
-all four conditions on the 396 prompts and on the held-out verbs, and
-without version~2 on the triples. Version~3 was run on Qwen3 on 100
+all four conditions on the 396 prompts, on the held-out verbs and on the
+planning triples, and without version~2 on the verb-form triples. Version~3 was run on Qwen3 on 100
 prompts.
 
 \paragraph{Reply format.}
@@ -396,7 +418,11 @@ answer. For prompts expected to be clarified, a reply receives credit if
 it asks about the ambiguity in the prompt, or if it states in words the
 reading it adopts and its answer is right under that reading. A reply that
 follows one reading without saying so is a \emph{silent resolution} and
-receives no credit, even when its number matches a reading. A question
+receives no credit, even when its number matches a reading. A reply can
+also state a reading under which the answer is not determined (``20 is the
+capacity'') and still give an answer, by adding an assumption (``the jug
+starts full''). The reading is then visible, but the answer does not
+follow from it: such replies are counted apart and receive no credit. A question
 and a stated reading are different acts. A question acquires information.
 A stated reading does not, but it lets the reader correct the choice, and
 it is the only option when nobody can be asked. Both receive credit, and
@@ -428,7 +454,7 @@ otherwise.
 
 One result qualifies the others and is given first. The role-ambiguous
 prompts of the benchmark continue with a sentence that favors one
-reading. Without that sentence the smaller model handles 62\% of them
+reading. Without that sentence the smaller model handles 60\% of them
 unaided, and 0\% with it (Section~\ref{sec:triples}).
 
 \subsection{Baseline and effect of the skill}
@@ -470,8 +496,8 @@ study \cite{dubray2026grammarllm}.
   axis line style={gray}, tick style={gray}, enlarge y limits=0.10,
 ]
 \addplot[fill=cask,draw=none] coordinates {(12.8,0) (74.4,1) (57.6,2) (1.6,3) (52.8,4) (52.8,5) (47.2,6)};
-\addplot[fill=cstate,draw=none] coordinates {(67.2,0) (24.8,1) (41.6,2) (11.2,3) (22.4,4) (34.4,5) (38.4,6)};
-\addplot[fill=cother,draw=none] coordinates {(0,0) (0.8,1) (0,2) (22.4,3) (0.8,4) (0,5) (4.0,6)};
+\addplot[fill=cstate,draw=none] coordinates {(67.2,0) (24.8,1) (41.6,2) (11.2,3) (22.4,4) (34.4,5) (37.6,6)};
+\addplot[fill=cother,draw=none] coordinates {(0,0) (0.8,1) (0,2) (22.4,3) (0.8,4) (0,5) (4.8,6)};
 \addplot[fill=csilent,draw=none] coordinates {(20.0,0) (0,1) (0.8,2) (64.8,3) (24.0,4) (12.8,5) (10.4,6)};
 \legend{asks, states its reading, other, resolves silently}
 \end{axis}
@@ -498,7 +524,7 @@ Opus 5.5 & no skill & 16 & 84 & 0 & 25 & 80.0\% & 0.84 \\
 Qwen3-30B-A3B & no skill & 2 & 14 & 23 & 86 & 31.2\% & 0.67 \\
 & control & 66 & 28 & 1 & 30 & 76.0\% & 0.93 \\
 & skill & 66 & 43 & 0 & 16 & 87.2\% & 0.89 \\
-& version 2 & 59 & 48 & 5 & 13 & 89.6\% & 0.97 \\
+& version 2 & 59 & 47 & 5 & 14 & 88.8\% & 0.97 \\
 \bottomrule
 \end{tabular}
 \caption{Questions and stated readings, reported separately. ``Handled''
@@ -520,7 +546,10 @@ The gain is concentrated where the earlier study located the errors
 (Table~\ref{tab:cat}). On role-ambiguous verbs, credit rises from 0.57 to
 1.00 for Opus and from 0.00 to 0.88 for Qwen3. On the same-verb prompts,
 Qwen3 rises from 0.50 to 1.00, and reaches 1.00 in each of the four
-languages.
+languages. Both the failure and the remedy are the same in English,
+French, Spanish and German, although the skill is written in English and
+names one French verb. The confusion between a property and a state does
+not belong to one language.
 
 The skill also changes the form of the reply. Without it, Opus mostly
 states a reading and answers. With it, Opus mostly asks (93 questions
@@ -540,14 +569,14 @@ result needs a confirmation on prompts written by someone else.
 \cmidrule(lr){2-4}\cmidrule(l){5-8}
 Measure & no skill & skill & v2 & no skill & control & skill & v2 \\
 \midrule
-Ambiguity handled (asked, or reading stated), $n=125$ & 80.0\% & 99.2\% & 99.2\% & 31.2\% & 76.0\% & 87.2\% & 89.6\% \\
+Ambiguity handled (asked, or reading stated), $n=125$ & 80.0\% & 99.2\% & 99.2\% & 31.2\% & 76.0\% & 87.2\% & 88.8\% \\
 Ambiguity resolved silently & 20.0\% & 0.0\% & 0.8\% & 64.8\% & 24.0\% & 12.8\% & 10.4\% \\
 Clear prompts answered correctly, $n=191$ & 97.4\% & 96.3\% & 97.9\% & 95.3\% & 96.3\% & 93.7\% & 95.3\% \\
 Needless questions on clear prompts & 1.6\% & 3.1\% & 1.6\% & 0.5\% & 2.6\% & 4.2\% & 1.0\% \\
 Missing quantity asked for, $n=43$ & 100\% & 100\% & 100\% & 100\% & 100\% & 100\% & 100\% \\
 Impossible or contradictory detected, $n=37$ & 100\% & 100\% & 100\% & 91.9\% & 91.9\% & 97.3\% & 100\% \\
-Mean credit, $n=396$ & 0.924 & 0.980 & 0.987 & 0.753 & 0.899 & 0.927 & 0.944 \\
-Better / worse than no skill & & 25 / 3 & 27 / 2 & & 66 / 8 & 80 / 11 & 83 / 7 \\
+Mean credit, $n=396$ & 0.924 & 0.980 & 0.987 & 0.753 & 0.899 & 0.927 & 0.942 \\
+Better / worse than no skill & & 25 / 3 & 27 / 2 & & 66 / 8 & 80 / 11 & 82 / 7 \\
 Mean output tokens & 380 & 915 & 783 & 1,695 & 2,330 & 3,882 & 3,546 \\
 \bottomrule
 \end{tabular}
@@ -565,7 +594,7 @@ tokens of Qwen3.}
 & Category & $n$ & no skill & skill & v2 & no skill & control & skill & v2 \\
 \midrule
 C1 & Clear property and state & 50 & 1.00 & 1.00 & 1.00 & 1.00 & 0.96 & 0.96 & 0.98 \\
-C2 & Role-ambiguous verb & 40 & 0.57 & 1.00 & 1.00 & 0.00 & 0.60 & 0.88 & 0.88 \\
+C2 & Role-ambiguous verb & 40 & 0.57 & 1.00 & 1.00 & 0.00 & 0.60 & 0.88 & 0.85 \\
 C3 & Same verb for property and state & 60 & 1.00 & 1.00 & 1.00 & 0.50 & 0.97 & 1.00 & 1.00 \\
 C4 & Rules worded with ``only'' & 33 & 0.64 & 0.79 & 0.88 & 0.61 & 0.67 & 0.64 & 0.76 \\
 C5 & Irreversible store & 30 & 1.00 & 0.97 & 1.00 & 0.93 & 0.90 & 0.87 & 0.90 \\
@@ -592,14 +621,15 @@ against 31\% without a system prompt and 87\% with the skill
 therefore produces most of the gain. The control also contains general
 advice on careful reading, so this is an upper bound on what the
 instruction does alone. Over the 396 prompts the skill is better than the control on 25
-prompts and worse on 14 ($p=0.11$), and version~2 is better on 28 and
-worse on 10 ($p=0.005$).
+prompts and worse on 14 ($p=0.11$), and version~2 is better on 27 and
+worse on 10 ($p=0.008$).
 
 The difference between the control and the skill is not spread evenly. It
 sits on the values whose role is open (Figure~\ref{fig:roles}): 0.60
 against 0.88 on role-ambiguous verbs. On the same-verb prompts, the
 references and the ``only'' rules the control does as well as the skill.
 The control also writes shorter replies (2,330 tokens against 3,882).
+These are one-step prompts. Planning problems are reported in Section~\ref{sec:plan}.
 
 \begin{figure}[t]
 \centering
@@ -615,10 +645,10 @@ The control also writes shorter replies (2,330 tokens against 3,882).
   legend style={at={(0.5,1.05)},anchor=south,legend columns=4,font=\small,draw=none,/tikz/every even column/.append style={column sep=8pt}},
   axis line style={gray}, tick style={gray},
 ]
-\addplot[fill=cother,draw=none] coordinates {(C2,0.00) (H2,0.00) (N2,0.62)};
+\addplot[fill=cother,draw=none] coordinates {(C2,0.00) (H2,0.00) (N2,0.60)};
 \addplot[fill=cstate,draw=none] coordinates {(C2,0.60) (H2,0.28) (N2,0.85)};
 \addplot[fill=cask,draw=none] coordinates {(C2,0.88) (H2,0.72) (N2,0.95)};
-\addplot[fill=cask!45,draw=none] coordinates {(C2,0.88) (H2,0.78)};
+\addplot[fill=cask!45,draw=none] coordinates {(C2,0.85) (H2,0.78)};
 \legend{no skill, control, skill, skill v2}
 \end{axis}
 \end{tikzpicture}
@@ -660,17 +690,79 @@ calls the simple present unclear on 75\% of the prompts, the progressive
 on 8\% and the modal (where the current number is missing) on 100\%.
 
 Second, the baseline is very different from that of C2. Without the skill,
-Qwen3 handles 62\% of the simple-present prompts, against 0\% when the
+Qwen3 handles 60\% of the simple-present prompts, against 0\% when the
 prompt continues with ``Then 5 people are removed''. A sentence that
 presupposes one reading is enough to make the model adopt it without
 comment. A reader may do the same, so the 0.00 of C2 measures a stricter
-requirement than the 0.62 of the triples: saying which reading was taken,
+requirement than the 0.60 of the triples: saying which reading was taken,
 even when the context favors it.
 
-Third, the skill still helps: 0.95 against 0.62 without it (better on 13
+Third, the skill still helps: 0.95 against 0.60 without it (better on 14
 prompts, worse on 0, $p<0.001$), and 0.85 for the control. With the skill
 the model asks on 36 of the 40 prompts. The skill costs two needless
 questions on the 40 progressive prompts.
+
+\subsubsection{Role ambiguity inside a planning problem}
+\label{sec:plan}
+
+The planning triples test the skill when the reasoning has several steps
+(Table~\ref{tab:plan}).
+
+\begin{table}[t]
+\centering\small
+\begin{tabular}{@{}L{7.4cm} rrrr@{}}
+\toprule
+Measure (Qwen3-30B-A3B, 30 prompts per row) & no skill & control & skill & v2 \\
+\midrule
+Amount stated: fewest actions found & 100\% & 100\% & 100\% & 100\% \\
+Capacity stated, jug empty: goal reported impossible & 20\% & 57\% & 93\% & 93\% \\
+\quad a plan is given anyway & 23 & 4 & 0 & 0 \\
+\quad a question is asked & 0 & 9 & 2 & 2 \\
+``Holds 20 litres'': ambiguity handled & 33\% & 13\% & 33\% & 47\% \\
+\quad by a question & 0 & 0 & 5 & 5 \\
+\quad by a stated reading, answer consistent with it & 10 & 4 & 5 & 9 \\
+\quad reading stated as a capacity, jug then assumed full & 0 & 3 & 15 & 11 \\
+\quad silent & 20 & 23 & 5 & 5 \\
+\quad reading visible to the reader (first three lines) & 33\% & 23\% & 83\% & 83\% \\
+\bottomrule
+\end{tabular}
+\caption{Planning triples. A question on the capacity version is counted
+as neither correct nor a plan. The stated readings of version~2 include
+one reported conflict on target.}
+\label{tab:plan}
+\end{table}
+
+Three results follow. First, the model plans correctly at every depth when
+the amount is stated. Solving is not the difficulty.
+
+Second, without the skill the model reads a stated capacity as contents.
+Told that jug A is empty and can hold at most 20 litres, it gives a plan
+in 23 of 30 cases, as if the jug held 20 litres. This is the error of the
+earlier study \cite{dubray2026grammarllm}, on a prompt whose wording is
+clear. The skill removes it (0 of 30), and the control reduces it (4 of
+30).
+
+Third, on the ambiguous version the skill changes what the reply shows
+more than what it concludes. Without the skill the model is silent on 20
+prompts of 30. With it, the reading is visible on 25: the reply asks (5),
+states that 20 is an amount (5), or states that 20 is a capacity and then
+assumes that the jug starts full (15), often with the reason that the
+problem could not be solved otherwise. In this last case the reader can
+see the choice, but the answer rests on an assumption that the prompt
+does not support. By the rule of this paper it is not handled, and the
+skill is then at 33\%, the same as the model alone. Version~2 is at
+47\% and the control at 13\%. None of these differences from the model
+alone is significant on 30 prompts.
+
+So the declaration does two different things inside a plan. It stops the
+model from planning with a stated capacity as an amount. It makes the
+model write down which reading it took. It does not make the model ask,
+and it does not stop the model from filling the gap with an assumption.
+
+Asked to judge the wording, the model calls 30\% of the ambiguous
+versions unclear, 0\% of the versions with a stated amount and 100\% of
+the versions with a stated capacity. With no tap, a capacity would leave
+no water, so the context favors the reading as an amount.
 
 \subsubsection{Replies without an invitation to ask}
 
@@ -688,9 +780,10 @@ quantities and references).
 \cmidrule(lr){2-3}\cmidrule(l){4-5}
 Measure & invitation & none & invitation & none \\
 \midrule
-Ambiguity handled, $n=125$ & 30.4\% & 31.2\% & 88.8\% & 85.6\% \\
+Ambiguity handled, $n=125$ & 30.4\% & 31.2\% & 88.8\% & 80.8\% \\
 \quad by a question & 2 & 0 & 65 & 0 \\
-\quad by a stated reading & 13 & 39 & 46 & 107 \\
+\quad by a stated reading & 13 & 39 & 46 & 101 \\
+\quad reading stated, answer resting on an added assumption & 0 & 0 & 0 & 6 \\
 Missing quantity asked for, $n=43$ & 100\% & 25.6\% & 100\% & 41.9\% \\
 Missing quantity guessed silently & 0\% & 16.3\% & 0\% & 0\% \\
 \bottomrule
@@ -701,16 +794,16 @@ you can answer, ask it'', Qwen3-30B-A3B.}
 \end{table}
 
 The effect of the skill on ambiguity does not depend on the invitation:
-86\% without it, 89\% with it. The model stops asking and states its
-reading (107 times). The invitation matters for missing quantities.
+81\% without it, 89\% with it. The model stops asking and states its
+reading (101 times). The invitation matters for missing quantities.
 Without it the model asks far less often. With the skill it then states
 an assumption or reports the gap, and never guesses silently. Without the
 skill it guesses silently on 16\% of these prompts.
 
 When the prompt says that nobody can be asked (role-ambiguous verbs,
-``only'' rules and references: 65 prompts expected to be clarified), the skill handles 69\% against 28\%
+``only'' rules and references: 65 prompts expected to be clarified), the skill handles 62\% against 28\%
 without it. With the skill all of these are stated readings. On role-ambiguous verbs the credit is
-0.90 against 0.07. This is the condition of an unattended agent.
+0.78 against 0.07. This is the condition of an unattended agent.
 
 \subsubsection{Recognition and behavior}
 
@@ -766,12 +859,21 @@ these prompts have a preferred reading.
 \subsubsection{Usefulness of the questions and of a rewrite}
 
 \paragraph{Questions followed by an answer.}
-A question is useful if its answer settles the problem. Each of the 209
-questions that Qwen3 asked on ambiguous prompts (without the skill, with
-the control, with the skill and with version~2, on the three sets) was
-answered in a second turn with one reading, always the one that has an
-exact answer. The model then gave the
-correct answer under that reading in all 209 cases.
+A question is useful if its answer settles the problem. Each question
+that Qwen3 asked on an ambiguous prompt, in any condition and on any set,
+was answered in a second turn with one reading. When the answer was the
+reading that has an exact answer (``34 is the number of people in the lift
+now''), the model then gave the correct answer in 219 cases of 219.
+
+When the answer was the other reading (``34 is the most it can take''),
+the correct move is to say that the current amount is not known. The
+model did so, or handled the reading correctly, in 250 cases of 278. The
+28 failures are concentrated where the answer leaves the model without a
+quantity. On role-ambiguous verbs followed by a removal it still gave a
+number in 16 cases of 70, and on the planning prompts it still gave a plan
+in 10 cases of 10.
+The questions are useful. The model is less reliable when the answer to
+its question removes the number it wanted.
 
 \paragraph{Rewriting the prompt once.}
 Step~4 of the skill rewrites a prompt. The 80 prompts with a role-ambiguous verb (the 40 of the benchmark
@@ -884,23 +986,23 @@ differ slightly from Table~\ref{tab:main}.}
 \item \textbf{Labels.} The author decided which prompts are ambiguous. No
 speaker judgments were collected, and ambiguity is graded: readers resolve
 most of it by preference without asking. The triples show the size of
-this effect on one category (0.00 against 0.62 without the skill). Three
+this effect on one category (0.00 against 0.60 without the skill). Three
 groups of labels are doubtful: the role-ambiguous prompts that continue
 with a removal, the same-verb prompts, where most readers would take
 ``contains exactly 9 litres'' as a capacity, and several ``only'' rules
 labeled clear. The scoring credits a stated reading, which limits the
 effect of these doubts: a model that says which reading it takes is
 credited.
-\item \textbf{Paired versions.} Only the verb-form triples give, for each
-ambiguous prompt, the two fully specified versions of the same prompt.
-For the other categories the clear controls are different prompts, so a
-failure to handle an ambiguity is not separated, prompt by prompt, from a
-failure to solve. The reasoning in the role-ambiguous prompts is one step
-deep.
+\item \textbf{Paired versions and depth.} Only the verb-form triples and
+the planning triples give, for each ambiguous prompt, the two fully
+specified versions of the same prompt. For the other categories the clear
+controls are different prompts. Reasoning of several steps is tested on
+one world and 30 problems.
 \item \textbf{Two models.} One frontier model and one quantized open-weight
 model were tested. They differ in size, origin, quantization and
-reasoning mode. The control, the additional sets, the probe and the
-endings without invitation were run on the open-weight model only.
+reasoning mode. The control, the additional sets, the probe, the
+follow-up turns and the endings without invitation were run on the
+open-weight model only.
 \item \textbf{Generated prompts.} The 396 prompts come from a few dozen
 templates, and the sign test treats them as independent. The study does
 not measure how often role ambiguity occurs in prompts that people write.
@@ -923,6 +1025,37 @@ version~3), with the same model file, build and sampling.
 categories. Version~3 was tested on 100 prompts and on one model.
 \end{itemize}
 
+\section{Future work}
+
+This study leaves the following questions open.
+
+\begin{itemize}\setlength\itemsep{2pt}
+\item \textbf{A ladder of models.} Silent resolution is 20\% on the
+frontier model and 65\% on the smaller one. A series of models of
+increasing capability would show whether it disappears as models improve.
+\item \textbf{The frontier model on the added conditions.} The control,
+the three added sets and the recognition probe remain to be run on Opus.
+\item \textbf{Chains of agents.} The study tests one model and one turn. A
+reading chosen silently by one agent and written into a note or a memory
+for the next is the subject of a companion study on memory records.
+\item \textbf{Declarations checked by code.} Every prompt has a declared
+world. The declaration that the model writes could be compared with it
+field by field, without a judge.
+\item \textbf{A declaration invented by the model, and a skill written by
+it.} The four categories were chosen by the author. A model could be asked
+to choose its own, or to write the rule from its own silent resolutions.
+\item \textbf{Inside the model.} On the open-weight model, the hidden
+states could show whether both readings are represented when it answers
+silently, and whether a property and a state are represented in the same
+way across languages.
+\item \textbf{Prompts from practice.} Technical and scientific texts state
+values that are measurements or specifications, observations or limits. A
+set drawn from such texts would measure how often the role of a value is
+open outside generated prompts.
+\item \textbf{Speaker judgments.} Graded judgments by readers would replace
+the two labels, clear and ambiguous.
+\end{itemize}
+
 \section{Conclusion}
 
 A language model that reads ``the lift carries 34 people'' picks a role for
@@ -931,14 +1064,18 @@ of five, and a smaller open-weight model one time out of three. The
 smaller model notices most of these problems when it is asked to judge
 the wording. It does not report them when it is asked to solve.
 
-Three findings follow for the remedy. An instruction to state the reading
-is the larger part of it: alone, it brings silent resolution from 65\% to
-24\% on the smaller model. The STAR declaration adds the part that
-concerns values whose role is open, and this part carries over to verbs
-the skill never names and to prompts where nobody can be asked. The
-remedy does not reach rules whose scope is open: the smaller model reads
-``only'' narrowly, reports no ambiguity, and does not recognize one when
-asked.
+Four findings follow for the remedy. On one-step prompts, an instruction
+to state the reading is the larger part of it: alone, it brings silent
+resolution from 65\% to 24\% on the smaller model. The STAR declaration
+adds the part that concerns values whose role is open, and this part
+carries over to verbs the skill never names and to prompts where nobody
+can be asked. Inside a planning problem the declaration removes an error on clear
+wording, in which the model plans with a stated capacity as if it were
+an amount. On the ambiguous version it makes the chosen reading visible
+in 83\% of the replies against 33\%, but half of these replies fill
+the gap with an assumption, and the model rarely asks. The remedy does not reach rules whose scope is open:
+the smaller model reads ``only'' narrowly, reports no ambiguity, and does
+not recognize one when asked.
 
 The second version of the skill is the one the data supports. It handles
 as many ambiguities as the first, asks fewer needless questions on both
@@ -948,8 +1085,8 @@ For people who write prompts, the practical points hold without any
 skill. State what each number is. State what a rule leaves allowed. Use a
 verb form that fixes the reading (``is carrying'', ``can carry''). And
 tell the model to say which reading it took: it usually notices that
-something is open. The benchmark, the versions of the skill, the control prompt,
-the runner and the scorers are available at
+something is open. The benchmark, the versions of the skill, the control
+prompt, the runner and the scorers are available at
 \url{https://github.com/cognitive-fab/star-clarify}.
 
 \section*{Acknowledgments}
@@ -964,10 +1101,13 @@ The author is the founder of Cognitive Fab LLC.
 \section*{Data availability}
 The benchmark generators, the 396 prompts and the additional sets, the
 skill texts and the control prompt, the scripts, the model replies and the
-scoring records are available at
+scoring records are available in a public repository:\\
 \url{https://github.com/cognitive-fab/star-clarify}.
 
 \begin{thebibliography}{99}\small
+\bibitem{buehler2026making} M.~J.~Buehler. By their own making.
+LinkedIn article, 25 November 2026.
+
 \bibitem{dubray2026grammarllm} J.-J.~Dubray. The grammar a language model
 reasons with. Preprints, 2026.
 \url{https://doi.org/10.20944/preprints202610.0509.v2}.

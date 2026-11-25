@@ -197,7 +197,7 @@ N3-022,control,N3,neutral-progressive-hosts,en,answer,correct,1.0,622
 N4-022,base,N4,neutral-modal-hosts,en,missing,flagged,1.0,377
 N4-022,skill,N4,neutral-modal-hosts,en,missing,asked,1.0,1597
 N4-022,control,N4,neutral-modal-hosts,en,missing,flagged,1.0,1639
-N2-023,base,N2,neutral-simple-hosts,en,clarify,stated-reading,1.0,551
+N2-023,base,N2,neutral-simple-hosts,en,clarify,stated-reading-assumed,0.0,551
 N2-023,skill,N2,neutral-simple-hosts,en,clarify,asked,1.0,2538
 N2-023,control,N2,neutral-simple-hosts,en,clarify,silent-pick,0.0,1127
 N3-023,base,N3,neutral-progressive-hosts,en,answer,correct,1.0,461

@@ -134,7 +134,7 @@ def main():
         m.add_argument("--items", nargs="+", default=[str(HERE / "items.jsonl"), str(HERE / "items-heldout.jsonl"), str(HERE / "items-neutral.jsonl"), str(HERE / "items-plan.jsonl")])
         m.add_argument("--reading", default="first", choices=["first", "other"], help="other: answer each question with the second reading")
         if name == "run":
-            m.add_argument("--skill", default=str(HERE / "skill" / "SKILL.md"))
+            m.add_argument("--skill", default=str(HERE / "skill" / "tested" / "SKILL.md"))
             m.add_argument("--provider", default="anthropic", choices=["anthropic", "openai"])
             m.add_argument("--base-url", default=""); m.add_argument("--key-env", default="ANTHROPIC_API_KEY")
             m.add_argument("--model", default="claude-opus-5-5")

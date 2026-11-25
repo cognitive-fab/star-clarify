@@ -111,7 +111,7 @@ def main():
     m.add_argument("--rewriter", default="skill", choices=["skill", "base"])
     m.add_argument("--items", nargs="+", default=[str(HERE / "items.jsonl"), str(HERE / "items-heldout.jsonl")])
     m.add_argument("--categories", nargs="+", default=["C2,H2"])
-    m.add_argument("--skill", default=str(HERE / "skill" / "SKILL.md"))
+    m.add_argument("--skill", default=str(HERE / "skill" / "tested" / "SKILL.md"))
     m.add_argument("--provider", default="anthropic", choices=["anthropic", "openai"])
     m.add_argument("--base-url", default=""); m.add_argument("--key-env", default="ANTHROPIC_API_KEY")
     m.add_argument("--model", default="claude-opus-5-5")

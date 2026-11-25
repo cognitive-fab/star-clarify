@@ -18,7 +18,23 @@ The paper is in `paper/star-clarify.pdf`.
 - An instruction to state the reading does most of the work.
 - The STAR declaration adds the part on values whose role is open, including on verbs the skill never names.
 - Asked to judge the wording, the smaller model calls 80% of the prompts it resolved silently unclear.
+- Inside a planning problem, the skill removes an error on clear wording: the model alone plans with a stated capacity as an amount on 23 prompts of 30, and on none with the skill.
 - Rules worded with "only" are not fixed by any version of the skill on the smaller model.
+
+## The skill
+
+The skill to use is `skill/star-prompt-clarifier/SKILL.md` (version 2). `skill/README.md` explains what it does, when to use it, what to expect, and what the other files are for.
+
+In short: before answering, the model declares the Things, States, Actions and Relationships of the prompt, looks for values whose role is open, and asks or states the reading it takes.
+
+Prompt: "The bookshelf holds 25 books. Then 10 books are removed. How many books are in the bookshelf now?"
+
+| | Last line of the reply (Claude Opus 5.5) |
+|---|---|
+| Without the skill | `FINAL: 15` |
+| With the skill | `FINAL: ASK: Does "the bookshelf holds 25 books" mean 25 books are on it now, or that it can fit at most 25 books?` |
+
+Expect replies about twice as long, and 1 to 2% of needless questions on clear prompts.
 
 ## Contents
 
@@ -29,9 +45,9 @@ The paper is in `paper/star-clarify.pdf`.
 | `items-neutral.jsonl` | 120 prompts in triples that differ only by the form of the verb |
 | `items-plan.jsonl` | 90 planning prompts with a role-ambiguous value at three depths |
 | `make_*.py` | The generators. Every prompt comes from a declared world, so its answers are computed |
-| `skill/SKILL.md` | The skill (version 1) |
-| `skill/SKILL-v2.md`, `skill/SKILL-v3.md` | Versions 2 and 3 |
-| `skill/CONTROL.md` | The control prompt without STAR |
+| `skill/star-prompt-clarifier/SKILL.md` | The skill to use (version 2) |
+| `skill/README.md` | What the skill does, when to use it, examples, what to expect |
+| `skill/tested/` | The exact texts behind each condition: versions 1, 2 and 3, and the control prompt without STAR |
 | `run.py` | Asks a model every prompt, in one or more conditions |
 | `score.py` | Scores a run. Numbers and yes/no answers by code, questions and stated readings by a judge model |
 | `probe.py` | Scores the recognition probe (code only) |
@@ -62,7 +78,7 @@ Conditions: `base` (no system prompt), `skill`, `skill2`, `skill3`, `control`, `
 
 Keys are read from environment variables (`ANTHROPIC_API_KEY`, and `MISTRAL_API_KEY` for the judge). Set them for the process only. Never write a key into a file.
 
-`python score.py <folder> --judge none` scores by code alone. It cannot see a reply that states its reading and then answers, so it undercounts handled ambiguities.
+`python score.py <folder> --judge cache` rescores from the saved judge verdicts, with no call. `python score.py <folder> --judge none` scores by code alone. It cannot see a reply that states its reading and then answers, so it undercounts handled ambiguities.
 
 ## Reply format
 
@@ -78,6 +94,7 @@ FINAL: IMPOSSIBLE: <one-line reason>
 
 - A prompt expected to be clarified is **handled** when the reply asks about its ambiguity, or states the reading it takes and answers correctly under it.
 - It is **resolved silently** when the reply follows one reading without saying so. This receives no credit, even when the number matches a reading.
+- A reply that states a reading under which the answer is unknown ("20 is the capacity") and still gives an answer has added an assumption. It is counted apart (`stated-reading-assumed`) and receives no credit.
 - A question on a clear prompt is counted as needless.
 
 ## Limits

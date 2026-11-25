@@ -103,7 +103,7 @@ class Subject:
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--items", default=str(HERE / "items.jsonl"))
-    ap.add_argument("--skill", default=str(HERE / "skill" / "SKILL.md"))
+    ap.add_argument("--skill", default=str(HERE / "skill" / "tested" / "SKILL.md"))
     ap.add_argument("--conditions", nargs="+", default=["base,skill"], help="any of base, skill, skill2, skill3, control (careful-reading prompt without STAR), probe (judge the wording, do not solve); add -noprime (e.g. base-noprime) to drop the line that says asking is allowed, or -noask (e.g. skill-noask) to say that nobody can be asked")
     ap.add_argument("--provider", default="anthropic", choices=["anthropic", "openai"])
     ap.add_argument("--base-url", default="")
